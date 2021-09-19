@@ -1,0 +1,3 @@
+requests
+pymongo==3.6.1
+python-dotenv
