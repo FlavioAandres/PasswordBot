@@ -1,2 +1,2 @@
-web: python3 bot.py
+web: python3 __init__.py
 
