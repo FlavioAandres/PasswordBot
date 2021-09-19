@@ -81,7 +81,7 @@ def _register_get_password_value(message):
 def start(environment): 
     if(environment == 'test' or environment=="prod"): 
         bot.set_webhook(
-            url="https://passwordpecuebot.herokuapp.com/", 
-            port=os.environ.get('PORT', 5000))
+            url=f"https://passwordpecuebot.herokuapp.com:{os.environ.get('PORT', 5000)}"
+        )
     else:
         bot.polling(); 
