@@ -20,7 +20,7 @@ chats = {}
 # Empty webserver index, return nothing, just http 200
 @app.route('/', methods=['GET', 'HEAD'])
 def index():
-    return {"msg": "Welcome to finances bot API. Find it on Telegram as: @PasswordPecueBot. All opensource contribution is great. "}
+    return {"msg": "Welcome to password-bot API. Find it on Telegram as: @PasswordPecueBot. All opensource contribution is great. "}
 
 @app.route(WEBHOOK_URL_PATH, methods=['POST'])
 def webhook():
