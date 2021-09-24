@@ -112,8 +112,6 @@ def start(environment):
         print(url)
         bot.set_webhook(url=url)
         # Start flask server
-        app.run(host=WEBHOOK_LISTEN,
-                port=WEBHOOK_PORT,
-                debug=True)
+        app.run(port=os.environ.get('PORT', 80))
     else:
         bot.polling(); 
