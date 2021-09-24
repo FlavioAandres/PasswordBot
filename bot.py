@@ -107,10 +107,10 @@ def start(environment):
     if(environment == 'test' or environment=="prod"): 
         bot.remove_webhook()
         time.sleep(0.1)
-
+        url = WEBHOOK_URL_BASE + WEBHOOK_URL_PATH
         # Set webhook
-        bot.set_webhook(url=WEBHOOK_URL_BASE + WEBHOOK_URL_PATH)
-
+        print(url)
+        bot.set_webhook(url=url)
         # Start flask server
         app.run(host=WEBHOOK_LISTEN,
                 port=WEBHOOK_PORT,
