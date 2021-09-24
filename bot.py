@@ -2,10 +2,25 @@ from posix import environ
 from re import split
 import telebot
 import os
-bot = telebot.TeleBot(os.environ.get('BOT_TOKEN'))
-from src import PasswordRepository;
+import time
 
+from src import PasswordRepository;
+import flask 
+API_TOKEN=os.environ.get('BOT_TOKEN')
+WEBHOOK_HOST = f"https://passwordpecuebot.herokuapp.com"
+WEBHOOK_PORT = 80  # 443, 80, 88 or 8443 (port need to be 'open')
+WEBHOOK_LISTEN = '0.0.0.0'  # In some VPS you may need to put here the IP addr
+WEBHOOK_URL_BASE = f"http://{WEBHOOK_HOST}:%{WEBHOOK_PORT}";
+WEBHOOK_URL_PATH = "/%s/" % (API_TOKEN)
+
+bot = telebot.TeleBot(API_TOKEN)
+app = flask.Flask(__name__); 
 chats = {}
+
+# Empty webserver index, return nothing, just http 200
+@app.route('/', methods=['GET', 'HEAD'])
+def index():
+    return {"msg": "Welcome to finances bot API. Find it on Telegram as: @PasswordPecueBot. All opensource contribution is great. "}
 
 @bot.message_handler(commands=['start', 'help']) 
 def _start(message): 
@@ -80,7 +95,15 @@ def _register_get_password_value(message):
 
 def start(environment): 
     if(environment == 'test' or environment=="prod"): 
-        bot.set_webhook(
-            url=f"https://passwordpecuebot.herokuapp.com")
+        bot.remove_webhook()
+        time.sleep(0.1)
+
+        # Set webhook
+        bot.set_webhook(url=WEBHOOK_URL_BASE + WEBHOOK_URL_PATH)
+
+        # Start flask server
+        app.run(host=WEBHOOK_LISTEN,
+                port=WEBHOOK_PORT,
+                debug=True)
     else:
         bot.polling(); 
