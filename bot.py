@@ -7,11 +7,11 @@ import time
 from src import PasswordRepository;
 import flask 
 API_TOKEN=os.environ.get('BOT_TOKEN')
-WEBHOOK_HOST = f"https://passwordpecuebot.herokuapp.com"
+WEBHOOK_HOST = f"passwordpecuebot.herokuapp.com"
 WEBHOOK_PORT = 80  # 443, 80, 88 or 8443 (port need to be 'open')
 WEBHOOK_LISTEN = '0.0.0.0'  # In some VPS you may need to put here the IP addr
-WEBHOOK_URL_BASE = f"https://{WEBHOOK_HOST}:%{WEBHOOK_PORT}";
-WEBHOOK_URL_PATH = "/%s/" % (API_TOKEN)
+WEBHOOK_URL_BASE = f"https://{WEBHOOK_HOST}:{WEBHOOK_PORT}";
+WEBHOOK_URL_PATH = f"/{API_TOKEN}/"
 
 bot = telebot.TeleBot(API_TOKEN)
 app = flask.Flask(__name__); 
