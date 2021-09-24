@@ -8,7 +8,7 @@ from src import PasswordRepository;
 import flask 
 API_TOKEN=os.environ.get('BOT_TOKEN')
 WEBHOOK_HOST = f"passwordpecuebot.herokuapp.com"
-WEBHOOK_PORT = 80  # 443, 80, 88 or 8443 (port need to be 'open')
+WEBHOOK_PORT = 443  # 443, 80, 88 or 8443 (port need to be 'open')
 WEBHOOK_LISTEN = '0.0.0.0'  # In some VPS you may need to put here the IP addr
 WEBHOOK_URL_BASE = f"https://{WEBHOOK_HOST}:{WEBHOOK_PORT}";
 WEBHOOK_URL_PATH = f"/{API_TOKEN}/"
@@ -112,6 +112,8 @@ def start(environment):
         print(url)
         bot.set_webhook(url=url)
         # Start flask server
-        app.run(port=os.environ.get('PORT', 80))
+        port = int(os.environ.get("PORT", 5000))
+        app.run(host='0.0.0.0', port=port)
+
     else:
         bot.polling(); 
