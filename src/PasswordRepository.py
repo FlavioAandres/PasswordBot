@@ -51,7 +51,12 @@ def get_password(phone,name=""):
         'phone': phone
     }
     if(name != ""): 
-        search["name"] = name
+        search = search | {
+            "name": {
+                "$regex": name,
+                "$options" :'ig' # case-insensitive
+            }
+        }
     password_collection = db.passwords;
     try:
         password_info = password_collection.find(search)
