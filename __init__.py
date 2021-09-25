@@ -21,20 +21,21 @@ app = flask.Flask(__name__);
 def index():
     return {"msg": "Welcome to password-bot API. Find it on Telegram as: @PasswordPecueBot. All opensource contribution is great. "}
 
-@app.route(WEBHOOK_URL_PATH, methods=['POST'])
-def webhook():
-    botClient = bot.getBotInstance(); 
-    if flask.request.headers.get('content-type') == 'application/json':
-        json_string = flask.request.get_data().decode('utf-8')
-        update = TelebotTypes.Update.de_json(json_string)
-        botClient.process_new_updates([update])
-        return {"msg": "received."}
-    else:
-        flask.abort(403)
+def initializeBotRoute(botClient): 
+    @app.route(WEBHOOK_URL_PATH, methods=['POST'])
+    def webhook():
+        if flask.request.headers.get('content-type') == 'application/json':
+            json_string = flask.request.get_data().decode('utf-8')
+            update = TelebotTypes.Update.de_json(json_string)
+            botClient.process_new_updates([update])
+            return {"msg": "received."}
+        else:
+            flask.abort(403)
 
 def start(environment): 
     botClient = bot.getBotInstance(); 
     ## Configure commands
+    initializeBotRoute(botClient)
     startCommand.initStartCommand(botClient); 
     register.initRegisterCommands(botClient);
     search.initSearchCommands(botClient); 
