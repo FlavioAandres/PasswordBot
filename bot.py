@@ -1,6 +1,6 @@
 from posix import environ
 from re import split
-import telebot
+from telebot import types as TelebotTypes, telebot 
 import os
 import time
 
@@ -12,7 +12,7 @@ WEBHOOK_PORT = 443  # 443, 80, 88 or 8443 (port need to be 'open')
 WEBHOOK_LISTEN = '0.0.0.0'  # In some VPS you may need to put here the IP addr
 WEBHOOK_URL_BASE = f"https://{WEBHOOK_HOST}:{WEBHOOK_PORT}";
 WEBHOOK_URL_PATH = f"/{API_TOKEN}/"
-
+WELCOME_EXTRA_MESSAGE = '' if os.environ.get('STAGE') != "dev" else "🚨WARNING: Maintance-mode Bot running...\n"
 bot = telebot.TeleBot(API_TOKEN)
 app = flask.Flask(__name__); 
 chats = {}
@@ -34,11 +34,14 @@ def webhook():
 
 @bot.message_handler(commands=['start', 'help']) 
 def _start(message): 
-    msg = """
+    msg = f"""
+    {WELCOME_EXTRA_MESSAGE}
     👋🏻 Hello! Wellcome to Password bot. 
     Use the followings commands: 
     /register 
     /get 
+    /getAll 
+    
     """;
     bot.send_message(message.chat.id, msg)
 
@@ -49,15 +52,35 @@ def get_password(message):
         passwordName = split(' ', message.text)[1];
     except Exception:
         bot.send_message(message.chat.id, "😞 Try again by sending /get <password_name>.")
-    
+    msg=""
     if(passwordName):
         password = PasswordRepository.get_password(
             name= passwordName, 
             phone=message.from_user.id
         ); 
-        msg = f"{password}" if(password) else \
-              f"👉🏻 We couldn't find your password for: {passwordName}"; 
+        if isinstance(password, list):
+            markup = TelebotTypes.ReplyKeyboardMarkup()
+            options = list(map(lambda pass_name: TelebotTypes.KeyboardButton(pass_name), password))
+            markup.row(*options)
+            bot.register_next_step_handler(message, _get_password_value); 
+            return bot.send_message(message.chat.id, "You've many options to choose, select one:  ", reply_markup=markup)
+        else:
+            msg = f"{password}" if password else \
+                f"👉🏻 We couldn't find your password for: {passwordName}"; 
+        
         bot.send_message(message.chat.id, msg) 
+
+def _get_password_value(message):
+    text = message.text
+    password = PasswordRepository.get_password(
+        name=text, 
+        phone=message.from_user.id
+    ); 
+    if password != None: 
+        msg=f"{password}"
+    else: 
+        msg = "🙅🏼‍♀️: Wrong password passed."
+    bot.send_message(message.chat.id, msg) 
 
 @bot.message_handler(commands=['getAll'])
 def get_all_passwords(message): 
@@ -66,7 +89,7 @@ def get_all_passwords(message):
         phone=phone_id
     ); 
     if(all_passwords): 
-        parsed_values = "Your saved passwords: "
+        parsed_values = "Your saved passwords: \n👉🏻"
         parsed_values += "\n👉🏻".join([str(password) for password in all_passwords])
         bot.send_message(message.chat.id, parsed_values) 
 
@@ -76,18 +99,43 @@ def get_all_passwords(message):
 
 @bot.message_handler(commands=['register']) 
 def _register_init(message): 
-    msg = """
-    Sure, I can surely save your password, please give me the name for the new one: 
+    text = split(pattern=" ", string=message.text)
+    phone_id = message.from_user.id;
+    chat_id = message.chat.id
+    name_input = text[1] if len(text) > 1 else None; 
+
     """
-    bot.reply_to(message, msg)
-    bot.register_next_step_handler(message, _register_get_name); 
+    if password was given in /register <password>
+    """
+    if name_input != None: 
+        existsName = PasswordRepository.get_password(phone=phone_id, name=name_input)
+        if existsName != None:
+            message_response="🙅🏼‍♀️ This password name already exists. Use a new one"
+        else: 
+            chats[chat_id] = (name_input, phone_id);
+            message_response = "✅ Nice, now give me your password value: "
+            bot.register_next_step_handler(message, _register_get_password_value); 
+    else: 
+        message_response = """
+        👩🏻‍✈️ Sure, I can surely save your password, please give me the name for the new one: 
+        """
+        bot.register_next_step_handler(message, _register_get_name); 
+    
+    bot.reply_to(message, message_response)
 
 def _register_get_name(message):
     password_name = message.text;
     phone_id = message.from_user.id;
     chat_id = message.chat.id
-    chats[chat_id] = (password_name, phone_id);
-    bot.reply_to(message, "Nice, now give me your password value: ")
+    existsName = PasswordRepository.get_password(phone=phone_id, name=password_name)
+    message_response=""
+    if existsName != None:
+        message_response="🙅🏼‍♀️ This password name already exists. Use a new one."
+    else:
+        chats[chat_id] = (password_name, phone_id);
+        message_response = "✅ Nice, now give me your password value: "
+        
+    bot.reply_to(message, message_response)
     bot.register_next_step_handler(message, _register_get_password_value); 
 
 def _register_get_password_value(message):
@@ -116,4 +164,6 @@ def start(environment):
         app.run(host='0.0.0.0', port=port)
 
     else:
+        bot.remove_webhook()
+        print('(-.-)::password-bot -> initialized')
         bot.polling(); 
