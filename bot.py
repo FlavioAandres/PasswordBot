@@ -92,7 +92,8 @@ def get_all_passwords(message):
         parsed_values = "Your saved passwords: \n👉🏻"
         parsed_values += "\n👉🏻".join([str(password) for password in all_passwords])
         bot.send_message(message.chat.id, parsed_values) 
-
+    else: 
+        bot.send_message(message.chat.id, "🧟‍♀️ We couldn't find any password saved.") 
 
 
 
