@@ -13,7 +13,7 @@ def initRegisterCommands(bot):
         name_input = text[1] if len(text) > 1 else None; 
 
         """
-        if password was given in /register <password>
+        if password name was given in /register <password_name>
         """
         if name_input != None: 
             existsName = PasswordRepository.get_password(phone=phone_id, name=name_input)
@@ -24,15 +24,16 @@ def initRegisterCommands(bot):
                 message_response = "✅ Nice, now give me your password value: "
                 bot.register_next_step_handler(message, _register_get_password_value); 
         else: 
-            message_response = """
-            👩🏻‍✈️ Sure, I can surely save your password, please give me the name for the new one: 
-            """
+            message_response = "👩🏻‍✈️ Sure, I can surely save your password, please give me the name for the new one: "\
+                               "<i> cancel with: /stop </i>";
             bot.register_next_step_handler(message, _register_get_name); 
         
-        bot.reply_to(message, message_response)
+        bot.reply_to(message, message_response, parse_mode='HTML')
 
     def _register_get_name(message):
         password_name = message.text;
+        if password_name == "/stop": 
+            return bot.send_message(message.chat.id, "👮‍♀️🛑✋ Operation stopped.")
         phone_id = message.from_user.id;
         chat_id = message.chat.id
         existsName = PasswordRepository.get_password(phone=phone_id, name=password_name)

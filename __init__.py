@@ -7,12 +7,12 @@ from telebot import types as TelebotTypes
 import time; 
 from src.commands import register, search, start as startCommand; 
 
-API_TOKEN=os.environ.get('BOT_TOKEN')
-WEBHOOK_HOST = f"passwordpecuebot.herokuapp.com"
-WEBHOOK_PORT = 443  # 443, 80, 88 or 8443 (port need to be 'open')
-WEBHOOK_LISTEN = '0.0.0.0'  # In some VPS you may need to put here the IP addr
+API_TOKEN=os.environ.get('BOT_TOKEN'); 
+WEBHOOK_HOST = f"passwordpecuebot.herokuapp.com"; 
+WEBHOOK_PORT = 443; 
+WEBHOOK_LISTEN = '0.0.0.0';
 WEBHOOK_URL_BASE = f"https://{WEBHOOK_HOST}:{WEBHOOK_PORT}";
-WEBHOOK_URL_PATH = f"/{API_TOKEN}/"
+WEBHOOK_URL_PATH = f"/{API_TOKEN}/"; 
 
 app = flask.Flask(__name__); 
 
@@ -50,7 +50,6 @@ def start(environment):
         # Start flask server
         port = int(os.environ.get("PORT", 5000))
         app.run(host='0.0.0.0', port=port)
-
     else:
         botClient.remove_webhook()
         print('(-.-)::password-bot -> initialized')
