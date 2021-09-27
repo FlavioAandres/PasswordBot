@@ -8,9 +8,9 @@ import time;
 from src.commands import register, search, start as startCommand; 
 
 API_TOKEN=os.environ.get('BOT_TOKEN'); 
-WEBHOOK_HOST = f"passwordpecuebot.herokuapp.com"; 
-WEBHOOK_PORT = 443; 
-WEBHOOK_LISTEN = '0.0.0.0';
+WEBHOOK_HOST = os.environ.get('WEBHOOK_HOST'); 
+WEBHOOK_PORT = os.environ.get('WEBHOOK_PORT', 443); 
+WEBHOOK_LISTEN = os.environ.get('WEBHOOK_LISTEN', '0.0.0.0'); 
 WEBHOOK_URL_BASE = f"https://{WEBHOOK_HOST}:{WEBHOOK_PORT}";
 WEBHOOK_URL_PATH = f"/{API_TOKEN}/"; 
 
@@ -36,9 +36,9 @@ def start(environment):
     botClient = bot.getBotInstance(); 
     ## Configure commands
     initializeBotRoute(botClient)
-    startCommand.initStartCommand(botClient); 
-    register.initRegisterCommands(botClient);
     search.initSearchCommands(botClient); 
+    register.initRegisterCommands(botClient);
+    startCommand.initStartCommand(botClient); 
 
     if(environment == 'test' or environment=="prod"): 
         botClient.remove_webhook()

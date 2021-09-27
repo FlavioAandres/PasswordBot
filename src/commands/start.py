@@ -2,7 +2,7 @@ import os;
 
 WELCOME_EXTRA_MESSAGE = '' if os.environ.get('STAGE') != "dev" else "🚨⚠️ WARNING: Maintance-mode Bot running. You may act with precaation..\n"
 def initStartCommand(bot): 
-    @bot.message_handler(commands=['start', 'help']) 
+    @bot.message_handler(commands=['start', 'help', 'hello']) 
     def _start(message): 
         msg = WELCOME_EXTRA_MESSAGE; 
         msg += """

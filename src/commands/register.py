@@ -25,9 +25,8 @@ def initRegisterCommands(bot):
                 bot.register_next_step_handler(message, _register_get_password_value); 
         else: 
             message_response = "👩🏻‍✈️ Sure, I can surely save your password, please give me the name for the new one: "\
-                               "<i> cancel with: /stop </i>";
+                               "<i> cancel with: \n/stop </i>";
             bot.register_next_step_handler(message, _register_get_name); 
-        
         bot.reply_to(message, message_response, parse_mode='HTML')
 
     def _register_get_name(message):
@@ -43,9 +42,8 @@ def initRegisterCommands(bot):
         else:
             chats[chat_id] = (password_name, phone_id);
             message_response = "✅ Nice, now give me your password value: "
-            
+            bot.register_next_step_handler(message, _register_get_password_value); 
         bot.reply_to(message, message_response)
-        bot.register_next_step_handler(message, _register_get_password_value); 
 
     def _register_get_password_value(message):
         password_value = message.text;
@@ -57,4 +55,4 @@ def initRegisterCommands(bot):
             phone=phone_id,
             password=password_value
         );
-        bot.send_message(message.chat.id, "Saved successfully")
+        bot.send_message(message.chat.id, "🙋🏻‍♀️✅ Saved successfully.")
